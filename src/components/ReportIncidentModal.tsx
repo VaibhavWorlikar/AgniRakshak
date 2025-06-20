@@ -5,6 +5,7 @@ import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
 import { Label } from '@/components/ui/label';
 import { Dialog, DialogContent, DialogHeader, DialogTitle } from '@/components/ui/dialog';
+import { supabase } from '@/integrations/supabase/client';
 
 interface ReportIncidentModalProps {
   isOpen: boolean;
@@ -18,6 +19,7 @@ const ReportIncidentModal = ({ isOpen, onClose }: ReportIncidentModalProps) => {
     fireType: '',
     description: '',
     location: '',
+    priority: 'medium' as 'low' | 'medium' | 'high',
     image: null as File | null
   });
   const [isLoading, setIsLoading] = useState(false);
@@ -60,24 +62,45 @@ const ReportIncidentModal = ({ isOpen, onClose }: ReportIncidentModalProps) => {
     e.preventDefault();
     setIsLoading(true);
     
-    // Simulate API call
-    await new Promise(resolve => setTimeout(resolve, 2000));
-    
-    console.log('Incident Report:', formData);
-    alert('Emergency report submitted successfully! Fire department has been notified.');
+    try {
+      const { error } = await supabase
+        .from('incident_reports')
+        .insert([
+          {
+            reporter_name: formData.name,
+            reporter_phone: formData.phone,
+            fire_type: formData.fireType,
+            description: formData.description,
+            location: formData.location,
+            priority: formData.priority,
+            status: 'active'
+          }
+        ]);
+
+      if (error) {
+        console.error('Error submitting report:', error);
+        alert('Error submitting report. Please try again.');
+      } else {
+        alert('Emergency report submitted successfully! Fire department has been notified.');
+        onClose();
+        
+        // Reset form
+        setFormData({
+          name: '',
+          phone: '',
+          fireType: '',
+          description: '',
+          location: '',
+          priority: 'medium',
+          image: null
+        });
+      }
+    } catch (error) {
+      console.error('Error submitting report:', error);
+      alert('Error submitting report. Please try again.');
+    }
     
     setIsLoading(false);
-    onClose();
-    
-    // Reset form
-    setFormData({
-      name: '',
-      phone: '',
-      fireType: '',
-      description: '',
-      location: '',
-      image: null
-    });
   };
 
   const handleImageUpload = (e: React.ChangeEvent<HTMLInputElement>) => {
@@ -141,6 +164,21 @@ const ReportIncidentModal = ({ isOpen, onClose }: ReportIncidentModalProps) => {
               {fireTypes.map((type) => (
                 <option key={type} value={type}>{type}</option>
               ))}
+            </select>
+          </div>
+
+          <div>
+            <Label htmlFor="priority">Priority Level *</Label>
+            <select
+              id="priority"
+              value={formData.priority}
+              onChange={(e) => setFormData(prev => ({ ...prev, priority: e.target.value as 'low' | 'medium' | 'high' }))}
+              required
+              className="w-full p-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-red-500"
+            >
+              <option value="low">Low - Small fire, contained</option>
+              <option value="medium">Medium - Spreading fire</option>
+              <option value="high">High - Large fire, immediate danger</option>
             </select>
           </div>
 

@@ -1,12 +1,14 @@
 
 import React, { useState } from 'react';
-import { Menu, X, Flame, Phone } from 'lucide-react';
+import { Menu, X, Flame, Phone, LogOut, User, Shield } from 'lucide-react';
 import { Button } from '@/components/ui/button';
 import { Link, useLocation } from 'react-router-dom';
+import { useAuth } from '@/contexts/AuthContext';
 
 const Navbar = () => {
   const [isMenuOpen, setIsMenuOpen] = useState(false);
   const location = useLocation();
+  const { user, userProfile, signOut } = useAuth();
 
   const navLinks = [
     { name: 'Home', href: '/', path: '/' },
@@ -18,6 +20,11 @@ const Navbar = () => {
 
   const isActivePath = (path: string) => {
     return location.pathname === path;
+  };
+
+  const handleSignOut = async () => {
+    await signOut();
+    setIsMenuOpen(false);
   };
 
   return (
@@ -47,18 +54,48 @@ const Navbar = () => {
             ))}
           </div>
 
-          {/* Emergency Contact & Login */}
+          {/* Emergency Contact & Auth */}
           <div className="hidden md:flex items-center space-x-4">
             <div className="flex items-center space-x-2 text-red-600">
               <Phone className="h-4 w-4" />
               <span className="font-semibold">Emergency: 101</span>
             </div>
-            <Button 
-              variant="outline" 
-              className="border-red-600 text-red-600 hover:bg-red-600 hover:text-white"
-            >
-              Login / Admin Panel
-            </Button>
+            
+            {user ? (
+              <div className="flex items-center space-x-2">
+                {userProfile?.role === 'admin' && (
+                  <Link to="/admin">
+                    <Button 
+                      variant="outline" 
+                      size="sm"
+                      className="border-red-600 text-red-600 hover:bg-red-600 hover:text-white"
+                    >
+                      <Shield className="h-4 w-4 mr-2" />
+                      Admin Panel
+                    </Button>
+                  </Link>
+                )}
+                <Button 
+                  variant="outline" 
+                  size="sm"
+                  onClick={handleSignOut}
+                  className="border-gray-300 text-gray-700 hover:bg-gray-100"
+                >
+                  <LogOut className="h-4 w-4 mr-2" />
+                  Sign Out
+                </Button>
+              </div>
+            ) : (
+              <Link to="/auth">
+                <Button 
+                  variant="outline" 
+                  className="border-red-600 text-red-600 hover:bg-red-600 hover:text-white"
+                >
+                  <User className="h-4 w-4 mr-2" />
+                  Login / Sign Up
+                </Button>
+              </Link>
+            )}
           </div>
 
           {/* Mobile Menu Button */}
@@ -94,12 +131,42 @@ const Navbar = () => {
                 <Phone className="h-4 w-4" />
                 <span className="font-semibold">Emergency: 101</span>
               </div>
-              <Button 
-                variant="outline" 
-                className="border-red-600 text-red-600 hover:bg-red-600 hover:text-white mx-2"
-              >
-                Login / Admin Panel
-              </Button>
+              
+              {user ? (
+                <div className="space-y-2 px-2">
+                  {userProfile?.role === 'admin' && (
+                    <Link to="/admin" onClick={() => setIsMenuOpen(false)}>
+                      <Button 
+                        variant="outline" 
+                        size="sm"
+                        className="border-red-600 text-red-600 hover:bg-red-600 hover:text-white w-full"
+                      >
+                        <Shield className="h-4 w-4 mr-2" />
+                        Admin Panel
+                      </Button>
+                    </Link>
+                  )}
+                  <Button 
+                    variant="outline" 
+                    size="sm"
+                    onClick={handleSignOut}
+                    className="border-gray-300 text-gray-700 hover:bg-gray-100 w-full"
+                  >
+                    <LogOut className="h-4 w-4 mr-2" />
+                    Sign Out
+                  </Button>
+                </div>
+              ) : (
+                <Link to="/auth" onClick={() => setIsMenuOpen(false)}>
+                  <Button 
+                    variant="outline" 
+                    className="border-red-600 text-red-600 hover:bg-red-600 hover:text-white mx-2"
+                  >
+                    <User className="h-4 w-4 mr-2" />
+                    Login / Sign Up
+                  </Button>
+                </Link>
+              )}
             </div>
           </div>
         )}
