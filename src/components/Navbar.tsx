@@ -2,38 +2,48 @@
 import React, { useState } from 'react';
 import { Menu, X, Flame, Phone } from 'lucide-react';
 import { Button } from '@/components/ui/button';
+import { Link, useLocation } from 'react-router-dom';
 
 const Navbar = () => {
   const [isMenuOpen, setIsMenuOpen] = useState(false);
+  const location = useLocation();
 
   const navLinks = [
-    { name: 'Home', href: '#home' },
-    { name: 'Fire Safety Tips', href: '#safety-tips' },
-    { name: 'Report Incident', href: '#report' },
-    { name: 'Request NOC', href: '#noc' },
-    { name: 'Contact', href: '#contact' },
+    { name: 'Home', href: '/', path: '/' },
+    { name: 'Fire Safety Tips', href: '/fire-safety-tips', path: '/fire-safety-tips' },
+    { name: 'Report Incident', href: '/report-incident', path: '/report-incident' },
+    { name: 'Request NOC', href: '/request-noc', path: '/request-noc' },
+    { name: 'Contact', href: '/contact', path: '/contact' },
   ];
+
+  const isActivePath = (path: string) => {
+    return location.pathname === path;
+  };
 
   return (
     <nav className="sticky top-0 z-50 bg-white shadow-lg border-b-2 border-red-500">
       <div className="container mx-auto px-4">
         <div className="flex items-center justify-between h-16">
           {/* Logo */}
-          <div className="flex items-center space-x-2">
+          <Link to="/" className="flex items-center space-x-2">
             <Flame className="h-8 w-8 text-red-600" />
             <span className="text-2xl font-bold text-gray-800">FireHelp</span>
-          </div>
+          </Link>
 
           {/* Desktop Navigation */}
           <div className="hidden md:flex items-center space-x-8">
             {navLinks.map((link) => (
-              <a
+              <Link
                 key={link.name}
-                href={link.href}
-                className="text-gray-700 hover:text-red-600 transition-colors duration-200 font-medium"
+                to={link.path}
+                className={`transition-colors duration-200 font-medium ${
+                  isActivePath(link.path)
+                    ? 'text-red-600 border-b-2 border-red-600 pb-1'
+                    : 'text-gray-700 hover:text-red-600'
+                }`}
               >
                 {link.name}
-              </a>
+              </Link>
             ))}
           </div>
 
@@ -67,14 +77,18 @@ const Navbar = () => {
           <div className="md:hidden py-4 border-t border-gray-200">
             <div className="flex flex-col space-y-4">
               {navLinks.map((link) => (
-                <a
+                <Link
                   key={link.name}
-                  href={link.href}
-                  className="text-gray-700 hover:text-red-600 transition-colors duration-200 font-medium px-2"
+                  to={link.path}
+                  className={`font-medium px-2 transition-colors duration-200 ${
+                    isActivePath(link.path)
+                      ? 'text-red-600 font-semibold'
+                      : 'text-gray-700 hover:text-red-600'
+                  }`}
                   onClick={() => setIsMenuOpen(false)}
                 >
                   {link.name}
-                </a>
+                </Link>
               ))}
               <div className="flex items-center space-x-2 text-red-600 px-2">
                 <Phone className="h-4 w-4" />
