@@ -1,4 +1,3 @@
-
 import React, { useState } from 'react';
 import Navbar from '../components/Navbar';
 import Footer from '../components/Footer';
@@ -35,7 +34,7 @@ const ContactPage = () => {
         subject: '',
         message: ''
       });
-    },ا 1500);
+    }, 1500);
   };
 
   const handleInputChange = (field: string, value: string) => {
