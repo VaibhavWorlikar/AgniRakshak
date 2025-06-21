@@ -3,13 +3,14 @@ import React, { useState } from 'react';
 import { MessageCircle, X, Send, Bot, User } from 'lucide-react';
 import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
+import { supabase } from '@/integrations/supabase/client';
 
 const Chatbot = () => {
   const [isOpen, setIsOpen] = useState(false);
   const [messages, setMessages] = useState([
     {
       id: 1,
-      text: "Hello! I'm your Fire Safety Assistant. I can help with fire safety tips, emergency procedures, and guide you through reporting incidents. How can I help you today?",
+      text: "🔥 Hello! I'm your AI Fire Safety Assistant powered by Google Gemini. I'm here to help with fire safety tips, emergency procedures, fire prevention, and incident response guidance. How can I assist you today?",
       isBot: true,
       timestamp: new Date()
     }
@@ -38,33 +39,32 @@ const Chatbot = () => {
     setInputMessage('');
     setIsTyping(true);
 
-    // Simulate bot response (In real implementation, this would call Gemini API)
-    setTimeout(() => {
-      const botResponse = getBotResponse(message);
+    try {
+      // Call Gemini API through Edge Function
+      const { data, error } = await supabase.functions.invoke('gemini-chat', {
+        body: { message }
+      });
+
+      if (error) throw error;
+
       const botMessage = {
         id: Date.now() + 1,
-        text: botResponse,
+        text: data.response,
         isBot: true,
         timestamp: new Date()
       };
       setMessages(prev => [...prev, botMessage]);
+    } catch (error) {
+      console.error('Error calling Gemini API:', error);
+      const errorMessage = {
+        id: Date.now() + 1,
+        text: "I apologize, but I'm having trouble connecting to my AI service right now. For immediate fire emergencies, please call 101. For general fire safety questions, you can also check our Fire Safety Tips section.",
+        isBot: true,
+        timestamp: new Date()
+      };
+      setMessages(prev => [...prev, errorMessage]);
+    } finally {
       setIsTyping(false);
-    }, 1000);
-  };
-
-  const getBotResponse = (userMessage: string): string => {
-    const msg = userMessage.toLowerCase();
-    
-    if (msg.includes('fire safety') || msg.includes('tips')) {
-      return "Here are key fire safety tips:\n\n🏠 Install smoke detectors on every level\n🔥 Keep fire extinguishers accessible\n🚪 Plan and practice escape routes\n⚡ Check electrical cords regularly\n🍳 Never leave cooking unattended\n\nWould you like more specific information about any of these?";
-    } else if (msg.includes('emergency') || msg.includes('report')) {
-      return "For fire emergencies:\n\n🚨 IMMEDIATE: Call 101\n📍 Click the 'REPORT FIRE' button on the main page\n🏃 Evacuate safely if possible\n📱 Provide your exact location\n\nIs this an active emergency? If yes, please call 101 immediately!";
-    } else if (msg.includes('station') || msg.includes('nearest')) {
-      return "To find the nearest fire station:\n\n📍 Check the interactive map on our homepage\n🏢 View the Fire Station Directory section\n📞 Central Station (Downtown): 101-001\n🚗 Average response time: 4-6 minutes\n\nDo you need directions to a specific station?";
-    } else if (msg.includes('prevention')) {
-      return "Fire prevention essentials:\n\n✅ Regular maintenance of heating systems\n✅ Proper storage of flammable materials\n✅ Clean dryer vents and chimneys\n✅ Install fire-resistant materials\n✅ Educate family members on fire safety\n\nWould you like detailed prevention tips for a specific area (home, workplace, etc.)?";
-    } else {
-      return "I can help you with:\n\n🔥 Fire safety tips and prevention\n🚨 Emergency reporting procedures\n🏢 Fire station locations and contacts\n📋 Safety regulations and NOC requests\n\nWhat would you like to know more about?";
     }
   };
 
@@ -89,7 +89,7 @@ const Chatbot = () => {
             <div className="bg-red-600 text-white p-4 rounded-t-lg flex items-center justify-between">
               <div className="flex items-center">
                 <Bot className="h-5 w-5 mr-2" />
-                <span className="font-medium">Fire Safety Assistant</span>
+                <span className="font-medium">Fire AI Assistant</span>
               </div>
               <Button
                 onClick={() => setIsOpen(false)}
