@@ -102,7 +102,7 @@ const MapSection = () => {
   }, []);
 
   return (
-    <div className="relative h-[450px] w-full">
+    <div className="relative h-[600px] w-full">
       <div 
         ref={mapRef}
         className="w-full h-full rounded-lg shadow-lg"

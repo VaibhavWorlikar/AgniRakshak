@@ -9,7 +9,7 @@ interface EmergencyButtonProps {
 
 const EmergencyButton = ({ onClick }: EmergencyButtonProps) => {
   return (
-    <div className="absolute bottom-6 left-1/2 transform -translate-x-1/2 z-20 flex flex-col items-center space-y-4">
+    <div className="absolute bottom-8 left-1/2 transform -translate-x-1/2 z-[1001] flex flex-col items-center space-y-4">
       {/* Main Emergency Button */}
       <Button
         onClick={onClick}
