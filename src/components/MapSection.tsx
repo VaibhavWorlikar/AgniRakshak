@@ -1,103 +1,135 @@
 
-import React, { useEffect, useRef } from 'react';
+import React, { useEffect, useRef, useState } from 'react';
 
 const MapSection = () => {
   const mapRef = useRef<HTMLDivElement>(null);
+  const [userLocation, setUserLocation] = useState<[number, number] | null>(null);
 
   useEffect(() => {
     if (!mapRef.current) return;
 
-    // Initialize the map
-    const map = (window as any).L.map(mapRef.current).setView([19.0760, 72.8777], 13);
-
-    // Add tile layer
-    (window as any).L.tileLayer('https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png', {
-      attribution: '&copy; OpenStreetMap contributors'
-    }).addTo(map);
-
-    // Function to fetch and display fire stations
-    const fetchFireStations = async () => {
-      const lat = 19.0760;
-      const lon = 72.8777;
-      
-      const query = `
-        [out:json];
-        node["amenity"="fire_station"](around:10000,${lat},${lon});
-        out;
-      `;
-
-      try {
-        const response = await fetch(`https://overpass-api.de/api/interpreter?data=${encodeURIComponent(query)}`);
-        const data = await response.json();
-        
-        data.elements.forEach((station: any) => {
-          const fireIcon = (window as any).L.divIcon({
-            html: `<div style="background-color: #dc2626; color: white; border-radius: 50%; width: 24px; height: 24px; display: flex; align-items: center; justify-content: center; font-size: 12px; font-weight: bold;">🚒</div>`,
-            className: 'fire-station-marker',
-            iconSize: [24, 24],
-            iconAnchor: [12, 12]
-          });
-
-          (window as any).L.marker([station.lat, station.lon], { icon: fireIcon })
-            .addTo(map)
-            .bindPopup(`<b>${station.tags.name || "Fire Station"}</b><br/>Emergency: 101`);
-        });
-      } catch (error) {
-        console.error('Error fetching fire stations:', error);
+    // Get user's current location
+    const getUserLocation = () => {
+      if (navigator.geolocation) {
+        navigator.geolocation.getCurrentPosition(
+          (position) => {
+            const lat = position.coords.latitude;
+            const lon = position.coords.longitude;
+            setUserLocation([lat, lon]);
+            initializeMap(lat, lon);
+          },
+          (error) => {
+            console.warn('Geolocation error:', error);
+            // Fallback to Mumbai coordinates
+            initializeMap(19.0760, 72.8777);
+          },
+          {
+            enableHighAccuracy: true,
+            timeout: 10000,
+            maximumAge: 300000 // 5 minutes
+          }
+        );
+      } else {
+        // Fallback to Mumbai coordinates
+        initializeMap(19.0760, 72.8777);
       }
     };
 
-    // Function to fetch and display hospitals
-    const fetchHospitals = async () => {
-      const lat = 19.0760;
-      const lon = 72.8777;
-      
-      const query = `
-        [out:json];
-        node["amenity"="hospital"](around:10000,${lat},${lon});
-        out;
-      `;
+    const initializeMap = (lat: number, lon: number) => {
+      // Initialize the map
+      const map = (window as any).L.map(mapRef.current).setView([lat, lon], 13);
 
-      try {
-        const response = await fetch(`https://overpass-api.de/api/interpreter?data=${encodeURIComponent(query)}`);
-        const data = await response.json();
-        
-        data.elements.forEach((hospital: any) => {
-          const hospitalIcon = (window as any).L.divIcon({
-            html: `<div style="background-color: #059669; color: white; border-radius: 50%; width: 24px; height: 24px; display: flex; align-items: center; justify-content: center; font-size: 12px; font-weight: bold;">🏥</div>`,
-            className: 'hospital-marker',
-            iconSize: [24, 24],
-            iconAnchor: [12, 12]
+      // Add tile layer with better styling
+      (window as any).L.tileLayer('https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png', {
+        attribution: '&copy; OpenStreetMap contributors',
+        maxZoom: 19
+      }).addTo(map);
+
+      // Add current location marker with enhanced styling
+      const currentLocationIcon = (window as any).L.divIcon({
+        html: `<div class="animate-pulse"><div style="background: linear-gradient(45deg, #2563eb, #3b82f6); color: white; border-radius: 50%; width: 20px; height: 20px; display: flex; align-items: center; justify-content: center; border: 3px solid white; box-shadow: 0 4px 12px rgba(37, 99, 235, 0.4);"><div style="width: 8px; height: 8px; background: white; border-radius: 50%;"></div></div></div>`,
+        className: 'current-location-marker',
+        iconSize: [26, 26],
+        iconAnchor: [13, 13]
+      });
+
+      (window as any).L.marker([lat, lon], { icon: currentLocationIcon })
+        .addTo(map)
+        .bindPopup('<b>📍 Your Current Location</b>');
+
+      // Function to fetch and display fire stations
+      const fetchFireStations = async () => {
+        const query = `
+          [out:json];
+          node["amenity"="fire_station"](around:10000,${lat},${lon});
+          out;
+        `;
+
+        try {
+          const response = await fetch(`https://overpass-api.de/api/interpreter?data=${encodeURIComponent(query)}`);
+          const data = await response.json();
+          
+          data.elements.forEach((station: any) => {
+            const fireIcon = (window as any).L.divIcon({
+              html: `<div style="background: linear-gradient(45deg, #dc2626, #ef4444); color: white; border-radius: 50%; width: 28px; height: 28px; display: flex; align-items: center; justify-content: center; font-size: 14px; font-weight: bold; border: 2px solid white; box-shadow: 0 4px 12px rgba(220, 38, 38, 0.4);">🚒</div>`,
+              className: 'fire-station-marker',
+              iconSize: [28, 28],
+              iconAnchor: [14, 14]
+            });
+
+            (window as any).L.marker([station.lat, station.lon], { icon: fireIcon })
+              .addTo(map)
+              .bindPopup(`<div class="p-2"><b>${station.tags.name || "Fire Station"}</b><br/><span class="text-red-600 font-semibold">🚨 Emergency: 101</span></div>`);
           });
+        } catch (error) {
+          console.error('Error fetching fire stations:', error);
+        }
+      };
 
-          (window as any).L.marker([hospital.lat, hospital.lon], { icon: hospitalIcon })
-            .addTo(map)
-            .bindPopup(`<b>${hospital.tags.name || "Hospital"}</b><br/>Emergency: 108`);
-        });
-      } catch (error) {
-        console.error('Error fetching hospitals:', error);
-      }
+      // Function to fetch and display hospitals
+      const fetchHospitals = async () => {
+        const query = `
+          [out:json];
+          node["amenity"="hospital"](around:10000,${lat},${lon});
+          out;
+        `;
+
+        try {
+          const response = await fetch(`https://overpass-api.de/api/interpreter?data=${encodeURIComponent(query)}`);
+          const data = await response.json();
+          
+          data.elements.forEach((hospital: any) => {
+            const hospitalIcon = (window as any).L.divIcon({
+              html: `<div style="background: linear-gradient(45deg, #059669, #10b981); color: white; border-radius: 50%; width: 28px; height: 28px; display: flex; align-items: center; justify-content: center; font-size: 14px; font-weight: bold; border: 2px solid white; box-shadow: 0 4px 12px rgba(5, 150, 105, 0.4);">🏥</div>`,
+              className: 'hospital-marker',
+              iconSize: [28, 28],
+              iconAnchor: [14, 14]
+            });
+
+            (window as any).L.marker([hospital.lat, hospital.lon], { icon: hospitalIcon })
+              .addTo(map)
+              .bindPopup(`<div class="p-2"><b>${hospital.tags.name || "Hospital"}</b><br/><span class="text-green-600 font-semibold">🏥 Emergency: 108</span></div>`);
+          });
+        } catch (error) {
+          console.error('Error fetching hospitals:', error);
+        }
+      };
+
+      // Fetch emergency services
+      fetchFireStations();
+      fetchHospitals();
     };
 
-    // Add current location marker
-    const currentLocationIcon = (window as any).L.divIcon({
-      html: `<div style="background-color: #2563eb; color: white; border-radius: 50%; width: 16px; height: 16px; display: flex; align-items: center; justify-content: center; border: 2px solid white; box-shadow: 0 2px 4px rgba(0,0,0,0.3);"></div>`,
-      className: 'current-location-marker',
-      iconSize: [16, 16],
-      iconAnchor: [8, 8]
-    });
-
-    (window as any).L.marker([19.0760, 72.8777], { icon: currentLocationIcon })
-      .addTo(map)
-      .bindPopup('<b>Your Location</b>');
-
-    // Fetch fire stations and hospitals
-    fetchFireStations();
-    fetchHospitals();
+    getUserLocation();
 
     // Cleanup function
     return () => {
-      map.remove();
+      if (mapRef.current) {
+        const mapInstance = (mapRef.current as any)._leaflet_map;
+        if (mapInstance) {
+          mapInstance.remove();
+        }
+      }
     };
   }, []);
 
@@ -105,28 +137,41 @@ const MapSection = () => {
     <div className="relative h-[600px] w-full">
       <div 
         ref={mapRef}
-        className="w-full h-full rounded-lg shadow-lg"
+        className="w-full h-full rounded-xl shadow-2xl border border-gray-200"
         id="leaflet-map"
       />
       
-      {/* Map Legend */}
-      <div className="absolute top-4 left-4 bg-white/90 backdrop-blur-sm rounded-lg p-4 shadow-lg z-[1000]">
-        <h3 className="font-bold text-gray-800 mb-2">Emergency Services</h3>
-        <div className="space-y-2 text-sm">
-          <div className="flex items-center">
-            <div className="w-6 h-6 bg-red-600 rounded-full flex items-center justify-center mr-2 text-white text-xs">🚒</div>
-            <span>Fire Stations (101)</span>
+      {/* Enhanced Map Legend */}
+      <div className="absolute top-6 left-6 bg-white/95 backdrop-blur-sm rounded-xl p-5 shadow-xl z-[1000] border border-gray-100">
+        <h3 className="font-bold text-gray-800 mb-3 text-lg">🚨 Emergency Services</h3>
+        <div className="space-y-3 text-sm">
+          <div className="flex items-center transition-all duration-200 hover:bg-red-50 p-2 rounded-lg">
+            <div className="w-7 h-7 bg-gradient-to-r from-red-600 to-red-500 rounded-full flex items-center justify-center mr-3 text-white text-sm shadow-lg">🚒</div>
+            <div>
+              <span className="font-medium text-gray-800">Fire Stations</span>
+              <div className="text-red-600 font-semibold text-xs">Call 101</div>
+            </div>
           </div>
-          <div className="flex items-center">
-            <div className="w-6 h-6 bg-green-600 rounded-full flex items-center justify-center mr-2 text-white text-xs">🏥</div>
-            <span>Hospitals (108)</span>
+          <div className="flex items-center transition-all duration-200 hover:bg-green-50 p-2 rounded-lg">
+            <div className="w-7 h-7 bg-gradient-to-r from-green-600 to-green-500 rounded-full flex items-center justify-center mr-3 text-white text-sm shadow-lg">🏥</div>
+            <div>
+              <span className="font-medium text-gray-800">Hospitals</span>
+              <div className="text-green-600 font-semibold text-xs">Call 108</div>
+            </div>
           </div>
-          <div className="flex items-center">
-            <div className="w-4 h-4 bg-blue-600 rounded-full mr-3 border-2 border-white"></div>
-            <span>Your Location</span>
+          <div className="flex items-center transition-all duration-200 hover:bg-blue-50 p-2 rounded-lg">
+            <div className="w-5 h-5 bg-gradient-to-r from-blue-600 to-blue-500 rounded-full mr-4 border-2 border-white shadow-lg animate-pulse"></div>
+            <span className="font-medium text-gray-800">Your Location</span>
           </div>
         </div>
       </div>
+
+      {/* Location Status Indicator */}
+      {userLocation && (
+        <div className="absolute top-6 right-6 bg-green-100 text-green-800 px-4 py-2 rounded-full text-sm font-medium shadow-lg border border-green-200">
+          📍 Location Detected
+        </div>
+      )}
     </div>
   );
 };

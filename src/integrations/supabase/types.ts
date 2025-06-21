@@ -13,13 +13,16 @@ export type Database = {
         Row: {
           created_at: string | null
           description: string | null
+          email: string | null
           fire_type: string
           id: string
           image_url: string | null
+          incident_type: string | null
           location: string | null
           priority: string | null
           reporter_name: string
           reporter_phone: string
+          severity: string | null
           status: string | null
           units_dispatched: number | null
           updated_at: string | null
@@ -28,13 +31,16 @@ export type Database = {
         Insert: {
           created_at?: string | null
           description?: string | null
+          email?: string | null
           fire_type: string
           id?: string
           image_url?: string | null
+          incident_type?: string | null
           location?: string | null
           priority?: string | null
           reporter_name: string
           reporter_phone: string
+          severity?: string | null
           status?: string | null
           units_dispatched?: number | null
           updated_at?: string | null
@@ -43,16 +49,79 @@ export type Database = {
         Update: {
           created_at?: string | null
           description?: string | null
+          email?: string | null
           fire_type?: string
           id?: string
           image_url?: string | null
+          incident_type?: string | null
           location?: string | null
           priority?: string | null
           reporter_name?: string
           reporter_phone?: string
+          severity?: string | null
           status?: string | null
           units_dispatched?: number | null
           updated_at?: string | null
+          user_id?: string | null
+        }
+        Relationships: []
+      }
+      noc_requests: {
+        Row: {
+          applicant_name: string
+          approved_by: string | null
+          building_area: string
+          created_at: string
+          email: string
+          expected_completion_date: string | null
+          id: string
+          noc_type: string
+          organization_name: string | null
+          phone: string
+          project_description: string
+          property_address: string
+          property_type: string
+          rejection_reason: string | null
+          status: string | null
+          updated_at: string
+          user_id: string | null
+        }
+        Insert: {
+          applicant_name: string
+          approved_by?: string | null
+          building_area: string
+          created_at?: string
+          email: string
+          expected_completion_date?: string | null
+          id?: string
+          noc_type: string
+          organization_name?: string | null
+          phone: string
+          project_description: string
+          property_address: string
+          property_type: string
+          rejection_reason?: string | null
+          status?: string | null
+          updated_at?: string
+          user_id?: string | null
+        }
+        Update: {
+          applicant_name?: string
+          approved_by?: string | null
+          building_area?: string
+          created_at?: string
+          email?: string
+          expected_completion_date?: string | null
+          id?: string
+          noc_type?: string
+          organization_name?: string | null
+          phone?: string
+          project_description?: string
+          property_address?: string
+          property_type?: string
+          rejection_reason?: string | null
+          status?: string | null
+          updated_at?: string
           user_id?: string | null
         }
         Relationships: []
