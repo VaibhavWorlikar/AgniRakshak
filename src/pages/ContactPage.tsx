@@ -1,3 +1,4 @@
+
 import React, { useState } from 'react';
 import Navbar from '../components/Navbar';
 import Footer from '../components/Footer';
@@ -50,20 +51,20 @@ const ContactPage = () => {
     },
     {
       icon: <Phone className="h-6 w-6" />,
-      title: "Office Phone",
-      details: ["+1 (555) 101-0000", "+1 (555) 101-0001"],
+      title: "Control Room",
+      details: ["022-2307-6751", "022-2307-6752"],
       color: "text-blue-600 bg-blue-50"
     },
     {
       icon: <Mail className="h-6 w-6" />,
       title: "Email Address",
-      details: ["info@firehelp.gov", "emergency@firehelp.gov"],
+      details: ["info@mumbaifirebrigade.gov.in", "emergency@mumbaifirebrigade.gov.in"],
       color: "text-green-600 bg-green-50"
     },
     {
       icon: <MapPin className="h-6 w-6" />,
       title: "Head Office",
-      details: ["123 Safety Street", "Downtown, City 12345"],
+      details: ["Byculla Fire Station", "Mumbai Central, Mumbai 400008"],
       color: "text-purple-600 bg-purple-50"
     }
   ];
@@ -87,7 +88,7 @@ const ContactPage = () => {
             Contact Us
           </h1>
           <p className="text-xl mb-6 max-w-2xl mx-auto">
-            Get in touch with our fire safety experts. We're here to help with your questions and concerns.
+            Get in touch with Mumbai Fire Brigade experts. We're here to help with your questions and concerns.
           </p>
         </div>
       </section>
@@ -252,9 +253,9 @@ const ContactPage = () => {
                     <div className="flex items-start space-x-2">
                       <MapPin className="h-5 w-5 text-blue-600 mt-0.5" />
                       <div>
-                        <p className="font-medium">Fire Department Headquarters</p>
-                        <p className="text-sm text-gray-600">123 Safety Street, Downtown</p>
-                        <p className="text-sm text-gray-600">City, State 12345</p>
+                        <p className="font-medium">Mumbai Fire Brigade Headquarters</p>
+                        <p className="text-sm text-gray-600">Byculla Fire Station, Mumbai Central</p>
+                        <p className="text-sm text-gray-600">Mumbai, Maharashtra 400008</p>
                       </div>
                     </div>
                     <Button variant="outline" className="mt-2">

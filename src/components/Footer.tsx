@@ -26,10 +26,10 @@ const Footer = () => {
           <div className="space-y-4">
             <div className="flex items-center space-x-2">
               <Flame className="h-8 w-8 text-red-500" />
-              <span className="text-2xl font-bold">FireHelp</span>
+              <span className="text-2xl font-bold">AgniRakshak</span>
             </div>
             <p className="text-gray-300 text-sm leading-relaxed">
-              Your trusted partner in fire safety and emergency response. 
+              Mumbai's trusted partner in fire safety and emergency response. 
               Protecting communities through rapid response, prevention education, and professional service.
             </p>
             <div className="flex space-x-4">
@@ -81,21 +81,21 @@ const Footer = () => {
               <div className="flex items-start space-x-3">
                 <MapPin className="h-4 w-4 text-red-500 mt-1 flex-shrink-0" />
                 <div className="text-sm text-gray-300">
-                  <p>Fire Department Headquarters</p>
-                  <p>123 Safety Street, Downtown</p>
-                  <p>City, State 12345</p>
+                  <p>Mumbai Fire Brigade Headquarters</p>
+                  <p>Byculla Fire Station, Mumbai Central</p>
+                  <p>Mumbai, Maharashtra 400008</p>
                 </div>
               </div>
               <div className="flex items-center space-x-3">
                 <Phone className="h-4 w-4 text-red-500" />
-                <a href="tel:101-000" className="text-sm text-gray-300 hover:text-white">
-                  101-000 (Non-Emergency)
+                <a href="tel:022-23076751" className="text-sm text-gray-300 hover:text-white">
+                  022-2307-6751 (Control Room)
                 </a>
               </div>
               <div className="flex items-center space-x-3">
                 <Mail className="h-4 w-4 text-red-500" />
-                <a href="mailto:info@firehelp.gov" className="text-sm text-gray-300 hover:text-white">
-                  info@firehelp.gov
+                <a href="mailto:info@mumbaifirebrigade.gov.in" className="text-sm text-gray-300 hover:text-white">
+                  info@mumbaifirebrigade.gov.in
                 </a>
               </div>
             </div>
@@ -107,7 +107,7 @@ const Footer = () => {
           <div className="flex flex-col md:flex-row justify-between items-center space-y-4 md:space-y-0">
             {/* Copyright */}
             <div className="text-sm text-gray-400">
-              © 2024 FireHelp Department. All rights reserved.
+              © 2024 AgniRakshak - Mumbai Fire Brigade. All rights reserved.
             </div>
 
             {/* Legal Links */}

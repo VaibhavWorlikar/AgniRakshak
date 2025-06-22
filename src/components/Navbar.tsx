@@ -34,7 +34,7 @@ const Navbar = () => {
           {/* Logo */}
           <Link to="/" className="flex items-center space-x-2">
             <Flame className="h-8 w-8 text-red-600" />
-            <span className="text-2xl font-bold text-gray-800">FireHelp</span>
+            <span className="text-2xl font-bold text-gray-800">AgniRakshak</span>
           </Link>
 
           {/* Desktop Navigation */}
