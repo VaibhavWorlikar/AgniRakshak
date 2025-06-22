@@ -1,3 +1,4 @@
+
 import React, { useEffect, useRef, useState } from 'react';
 import { Button } from '@/components/ui/button';
 
@@ -176,7 +177,7 @@ const MapSection = () => {
   };
 
   return (
-    <div className="relative h-[500px] w-full bg-gradient-to-br from-blue-50 to-gray-100">
+    <div className="relative h-full w-full bg-gradient-to-br from-blue-50 to-gray-100">
       <div 
         ref={mapRef}
         className="w-full h-full"
@@ -184,21 +185,21 @@ const MapSection = () => {
       />
       
       {/* Enhanced Map Legend with Filter Controls */}
-      <div className="absolute top-4 left-4 bg-white/95 backdrop-blur-sm rounded-xl p-4 shadow-lg z-[1000] border border-gray-100">
-        <h3 className="font-bold text-gray-800 mb-3 text-base">🚨 Emergency Services</h3>
-        <div className="space-y-3 text-sm">
+      <div className="absolute top-3 left-3 bg-white/95 backdrop-blur-sm rounded-xl p-3 shadow-lg z-[1000] border border-gray-100">
+        <h3 className="font-bold text-gray-800 mb-2 text-sm">🚨 Emergency Services</h3>
+        <div className="space-y-2 text-xs">
           <div className="flex items-center justify-between">
-            <div className="flex items-center transition-all duration-200 hover:bg-red-50 p-2 rounded-lg">
-              <div className="w-6 h-6 bg-gradient-to-r from-red-600 to-red-500 rounded-full flex items-center justify-center mr-3 text-white text-xs shadow-lg">🚒</div>
+            <div className="flex items-center transition-all duration-200 hover:bg-red-50 p-1 rounded-lg">
+              <div className="w-5 h-5 bg-gradient-to-r from-red-600 to-red-500 rounded-full flex items-center justify-center mr-2 text-white text-xs shadow-lg">🚒</div>
               <div>
-                <span className="font-medium text-gray-800 text-sm">Fire Stations</span>
+                <span className="font-medium text-gray-800 text-xs">Fire Stations</span>
                 <div className="text-red-600 font-semibold text-xs">Call 101</div>
               </div>
             </div>
             <Button
               variant="outline"
               size="sm"
-              className={`h-7 px-2 text-xs transition-all duration-200 ${
+              className={`h-6 px-2 text-xs transition-all duration-200 ${
                 showFireStations 
                   ? 'bg-red-600 text-white border-red-600 hover:bg-red-700' 
                   : 'bg-white text-red-600 border-red-200 hover:bg-red-50'
@@ -210,17 +211,17 @@ const MapSection = () => {
           </div>
           
           <div className="flex items-center justify-between">
-            <div className="flex items-center transition-all duration-200 hover:bg-green-50 p-2 rounded-lg">
-              <div className="w-6 h-6 bg-gradient-to-r from-green-600 to-green-500 rounded-full flex items-center justify-center mr-3 text-white text-xs shadow-lg">🏥</div>
+            <div className="flex items-center transition-all duration-200 hover:bg-green-50 p-1 rounded-lg">
+              <div className="w-5 h-5 bg-gradient-to-r from-green-600 to-green-500 rounded-full flex items-center justify-center mr-2 text-white text-xs shadow-lg">🏥</div>
               <div>
-                <span className="font-medium text-gray-800 text-sm">Hospitals</span>
+                <span className="font-medium text-gray-800 text-xs">Hospitals</span>
                 <div className="text-green-600 font-semibold text-xs">Call 108</div>
               </div>
             </div>
             <Button
               variant="outline"
               size="sm"
-              className={`h-7 px-2 text-xs transition-all duration-200 ${
+              className={`h-6 px-2 text-xs transition-all duration-200 ${
                 showHospitals 
                   ? 'bg-green-600 text-white border-green-600 hover:bg-green-700' 
                   : 'bg-white text-green-600 border-green-200 hover:bg-green-50'
@@ -231,16 +232,16 @@ const MapSection = () => {
             </Button>
           </div>
           
-          <div className="flex items-center transition-all duration-200 hover:bg-blue-50 p-2 rounded-lg">
-            <div className="w-4 h-4 bg-gradient-to-r from-blue-600 to-blue-500 rounded-full mr-3 border-2 border-white shadow-lg animate-pulse"></div>
-            <span className="font-medium text-gray-800 text-sm">Your Location</span>
+          <div className="flex items-center transition-all duration-200 hover:bg-blue-50 p-1 rounded-lg">
+            <div className="w-4 h-4 bg-gradient-to-r from-blue-600 to-blue-500 rounded-full mr-2 border-2 border-white shadow-lg animate-pulse"></div>
+            <span className="font-medium text-gray-800 text-xs">Your Location</span>
           </div>
         </div>
       </div>
 
       {/* Location Status Indicator */}
       {userLocation && (
-        <div className="absolute top-4 right-4 bg-green-100 text-green-800 px-3 py-1 rounded-full text-xs font-medium shadow-lg border border-green-200">
+        <div className="absolute top-3 right-3 bg-green-100 text-green-800 px-2 py-1 rounded-full text-xs font-medium shadow-lg border border-green-200">
           📍 Location Detected
         </div>
       )}

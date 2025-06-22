@@ -22,25 +22,27 @@ const Index = () => {
       <Navbar />
       
       {/* Hero Section with Map and Emergency Controls */}
-      <section className="relative bg-gradient-to-br from-gray-50 to-gray-100 py-8">
+      <section className="relative bg-gradient-to-br from-gray-50 to-gray-100 py-4">
         <div className="container mx-auto px-4">
-          <div className="grid lg:grid-cols-3 gap-8 items-start">
+          <div className="grid lg:grid-cols-3 gap-6 items-start" style={{ height: 'calc(100vh - 140px)' }}>
             {/* Map Section - Left Side */}
-            <div className="lg:col-span-2">
-              <div className="bg-white rounded-2xl shadow-xl border border-gray-200 overflow-hidden">
-                <div className="p-4 bg-gradient-to-r from-red-600 to-red-700 text-white">
-                  <h2 className="text-xl font-bold">🚨 Emergency Services Map</h2>
-                  <p className="text-red-100 text-sm">Real-time locations of fire stations and hospitals near you</p>
+            <div className="lg:col-span-2 h-full">
+              <div className="bg-white rounded-2xl shadow-xl border border-gray-200 overflow-hidden h-full">
+                <div className="p-3 bg-gradient-to-r from-red-600 to-red-700 text-white">
+                  <h2 className="text-lg font-bold">🚨 Emergency Services Map</h2>
+                  <p className="text-red-100 text-xs">Real-time locations of fire stations and hospitals near you</p>
                 </div>
-                <MapSection />
+                <div className="h-[calc(100%-80px)]">
+                  <MapSection />
+                </div>
               </div>
             </div>
 
             {/* Emergency Controls - Right Side */}
-            <div className="lg:col-span-1">
-              <div className="bg-white rounded-2xl shadow-xl border border-gray-200 p-6 space-y-6">
+            <div className="lg:col-span-1 h-full">
+              <div className="bg-white rounded-2xl shadow-xl border border-gray-200 p-4 space-y-4 h-full flex flex-col">
                 <div className="text-center">
-                  <h3 className="text-2xl font-bold text-gray-800 mb-2">Emergency Response</h3>
+                  <h3 className="text-xl font-bold text-gray-800 mb-2">Emergency Response</h3>
                   <p className="text-gray-600 text-sm">Quick access to emergency services</p>
                 </div>
 
@@ -51,17 +53,17 @@ const Index = () => {
                 <Button
                   variant="outline"
                   size="lg"
-                  className="w-full bg-white border-2 border-red-600 text-red-600 hover:bg-red-600 hover:text-white shadow-lg transition-all duration-300 transform hover:scale-105 hover:shadow-red-500/25 py-4 text-lg font-semibold"
+                  className="w-full bg-white border-2 border-red-600 text-red-600 hover:bg-red-600 hover:text-white shadow-lg transition-all duration-300 transform hover:scale-105 hover:shadow-red-500/25 py-3 text-lg font-semibold"
                   onClick={() => window.open('tel:101', '_self')}
                 >
-                  <Phone className="mr-3 h-6 w-6" />
+                  <Phone className="mr-3 h-5 w-5" />
                   Call 101 Now
                 </Button>
 
                 {/* Emergency Info */}
-                <div className="bg-red-50 border border-red-200 rounded-xl p-4 space-y-3">
-                  <h4 className="font-semibold text-red-800 text-center">Emergency Numbers</h4>
-                  <div className="space-y-2 text-sm">
+                <div className="bg-red-50 border border-red-200 rounded-xl p-3 space-y-2 flex-grow">
+                  <h4 className="font-semibold text-red-800 text-center text-sm">Emergency Numbers</h4>
+                  <div className="space-y-2 text-xs">
                     <div className="flex justify-between items-center">
                       <span className="text-gray-700">🚒 Fire Emergency:</span>
                       <span className="font-bold text-red-600">101</span>
@@ -78,9 +80,9 @@ const Index = () => {
                 </div>
 
                 {/* Safety Tip */}
-                <div className="bg-blue-50 border border-blue-200 rounded-xl p-4">
-                  <h4 className="font-semibold text-blue-800 mb-2">💡 Safety Tip</h4>
-                  <p className="text-blue-700 text-sm">In case of fire, evacuate immediately and call 101. Never use elevators during a fire emergency.</p>
+                <div className="bg-blue-50 border border-blue-200 rounded-xl p-3">
+                  <h4 className="font-semibold text-blue-800 mb-1 text-sm">💡 Safety Tip</h4>
+                  <p className="text-blue-700 text-xs">In case of fire, evacuate immediately and call 101. Never use elevators during a fire emergency.</p>
                 </div>
               </div>
             </div>
@@ -89,9 +91,9 @@ const Index = () => {
       </section>
 
       {/* Fire Safety Tips */}
-      <section className="py-16 bg-white">
+      <section className="py-12 bg-white">
         <div className="container mx-auto px-4">
-          <h2 className="text-3xl font-bold text-center mb-12 text-gray-800">
+          <h2 className="text-2xl font-bold text-center mb-8 text-gray-800">
             Fire Safety Tips
           </h2>
           <FireSafetyTips />
@@ -100,9 +102,9 @@ const Index = () => {
 
       {/* Recent Alerts - Only for logged in users */}
       {user && (
-        <section className="py-16 bg-gray-100">
+        <section className="py-12 bg-gray-100">
           <div className="container mx-auto px-4">
-            <h2 className="text-3xl font-bold text-center mb-12 text-gray-800">
+            <h2 className="text-2xl font-bold text-center mb-8 text-gray-800">
               Recent Alerts & Active Cases
             </h2>
             <RecentAlerts />
@@ -111,9 +113,9 @@ const Index = () => {
       )}
 
       {/* Fire Station Directory */}
-      <section className="py-16 bg-white">
+      <section className="py-12 bg-white">
         <div className="container mx-auto px-4">
-          <h2 className="text-3xl font-bold text-center mb-12 text-gray-800">
+          <h2 className="text-2xl font-bold text-center mb-8 text-gray-800">
             Fire Station Directory
           </h2>
           <FireStationDirectory />
