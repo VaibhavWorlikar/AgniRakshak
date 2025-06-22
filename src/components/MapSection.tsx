@@ -1,9 +1,17 @@
 
 import React, { useEffect, useRef, useState } from 'react';
+import { Button } from '@/components/ui/button';
 
 const MapSection = () => {
   const mapRef = useRef<HTMLDivElement>(null);
   const [userLocation, setUserLocation] = useState<[number, number] | null>(null);
+  const [fireStations, setFireStations] = useState<any[]>([]);
+  const [hospitals, setHospitals] = useState<any[]>([]);
+  const [fireStationMarkers, setFireStationMarkers] = useState<any[]>([]);
+  const [hospitalMarkers, setHospitalMarkers] = useState<any[]>([]);
+  const [mapInstance, setMapInstance] = useState<any>(null);
+  const [showFireStations, setShowFireStations] = useState(true);
+  const [showHospitals, setShowHospitals] = useState(true);
 
   useEffect(() => {
     if (!mapRef.current) return;
@@ -38,6 +46,7 @@ const MapSection = () => {
     const initializeMap = (lat: number, lon: number) => {
       // Initialize the map
       const map = (window as any).L.map(mapRef.current).setView([lat, lon], 13);
+      setMapInstance(map);
 
       // Add tile layer with better styling
       (window as any).L.tileLayer('https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png', {
@@ -68,8 +77,9 @@ const MapSection = () => {
         try {
           const response = await fetch(`https://overpass-api.de/api/interpreter?data=${encodeURIComponent(query)}`);
           const data = await response.json();
+          setFireStations(data.elements);
           
-          data.elements.forEach((station: any) => {
+          const markers = data.elements.map((station: any) => {
             const fireIcon = (window as any).L.divIcon({
               html: `<div style="background: linear-gradient(45deg, #dc2626, #ef4444); color: white; border-radius: 50%; width: 28px; height: 28px; display: flex; align-items: center; justify-content: center; font-size: 14px; font-weight: bold; border: 2px solid white; box-shadow: 0 4px 12px rgba(220, 38, 38, 0.4);">🚒</div>`,
               className: 'fire-station-marker',
@@ -77,10 +87,14 @@ const MapSection = () => {
               iconAnchor: [14, 14]
             });
 
-            (window as any).L.marker([station.lat, station.lon], { icon: fireIcon })
+            const marker = (window as any).L.marker([station.lat, station.lon], { icon: fireIcon })
               .addTo(map)
               .bindPopup(`<div class="p-2"><b>${station.tags.name || "Fire Station"}</b><br/><span class="text-red-600 font-semibold">🚨 Emergency: 101</span></div>`);
+            
+            return marker;
           });
+          
+          setFireStationMarkers(markers);
         } catch (error) {
           console.error('Error fetching fire stations:', error);
         }
@@ -97,8 +111,9 @@ const MapSection = () => {
         try {
           const response = await fetch(`https://overpass-api.de/api/interpreter?data=${encodeURIComponent(query)}`);
           const data = await response.json();
+          setHospitals(data.elements);
           
-          data.elements.forEach((hospital: any) => {
+          const markers = data.elements.map((hospital: any) => {
             const hospitalIcon = (window as any).L.divIcon({
               html: `<div style="background: linear-gradient(45deg, #059669, #10b981); color: white; border-radius: 50%; width: 28px; height: 28px; display: flex; align-items: center; justify-content: center; font-size: 14px; font-weight: bold; border: 2px solid white; box-shadow: 0 4px 12px rgba(5, 150, 105, 0.4);">🏥</div>`,
               className: 'hospital-marker',
@@ -106,10 +121,14 @@ const MapSection = () => {
               iconAnchor: [14, 14]
             });
 
-            (window as any).L.marker([hospital.lat, hospital.lon], { icon: hospitalIcon })
+            const marker = (window as any).L.marker([hospital.lat, hospital.lon], { icon: hospitalIcon })
               .addTo(map)
               .bindPopup(`<div class="p-2"><b>${hospital.tags.name || "Hospital"}</b><br/><span class="text-green-600 font-semibold">🏥 Emergency: 108</span></div>`);
+            
+            return marker;
           });
+          
+          setHospitalMarkers(markers);
         } catch (error) {
           console.error('Error fetching hospitals:', error);
         }
@@ -133,32 +152,86 @@ const MapSection = () => {
     };
   }, []);
 
+  // Toggle fire stations visibility
+  const toggleFireStations = () => {
+    if (!mapInstance) return;
+    
+    if (showFireStations) {
+      fireStationMarkers.forEach(marker => mapInstance.removeLayer(marker));
+    } else {
+      fireStationMarkers.forEach(marker => mapInstance.addLayer(marker));
+    }
+    setShowFireStations(!showFireStations);
+  };
+
+  // Toggle hospitals visibility
+  const toggleHospitals = () => {
+    if (!mapInstance) return;
+    
+    if (showHospitals) {
+      hospitalMarkers.forEach(marker => mapInstance.removeLayer(marker));
+    } else {
+      hospitalMarkers.forEach(marker => mapInstance.addLayer(marker));
+    }
+    setShowHospitals(!showHospitals);
+  };
+
   return (
-    <div className="relative h-[600px] w-full">
+    <div className="relative h-[70vh] w-full bg-gradient-to-br from-blue-50 to-gray-100">
       <div 
         ref={mapRef}
-        className="w-full h-full rounded-xl shadow-2xl border border-gray-200"
+        className="w-full h-full"
         id="leaflet-map"
       />
       
-      {/* Enhanced Map Legend */}
+      {/* Enhanced Map Legend with Filter Controls */}
       <div className="absolute top-6 left-6 bg-white/95 backdrop-blur-sm rounded-xl p-5 shadow-xl z-[1000] border border-gray-100">
         <h3 className="font-bold text-gray-800 mb-3 text-lg">🚨 Emergency Services</h3>
         <div className="space-y-3 text-sm">
-          <div className="flex items-center transition-all duration-200 hover:bg-red-50 p-2 rounded-lg">
-            <div className="w-7 h-7 bg-gradient-to-r from-red-600 to-red-500 rounded-full flex items-center justify-center mr-3 text-white text-sm shadow-lg">🚒</div>
-            <div>
-              <span className="font-medium text-gray-800">Fire Stations</span>
-              <div className="text-red-600 font-semibold text-xs">Call 101</div>
+          <div className="flex items-center justify-between">
+            <div className="flex items-center transition-all duration-200 hover:bg-red-50 p-2 rounded-lg">
+              <div className="w-7 h-7 bg-gradient-to-r from-red-600 to-red-500 rounded-full flex items-center justify-center mr-3 text-white text-sm shadow-lg">🚒</div>
+              <div>
+                <span className="font-medium text-gray-800">Fire Stations</span>
+                <div className="text-red-600 font-semibold text-xs">Call 101</div>
+              </div>
             </div>
+            <Button
+              variant="outline"
+              size="sm"
+              className={`h-8 px-3 text-xs transition-all duration-200 ${
+                showFireStations 
+                  ? 'bg-red-600 text-white border-red-600 hover:bg-red-700' 
+                  : 'bg-white text-red-600 border-red-200 hover:bg-red-50'
+              }`}
+              onClick={toggleFireStations}
+            >
+              {showFireStations ? 'Hide' : 'Show'}
+            </Button>
           </div>
-          <div className="flex items-center transition-all duration-200 hover:bg-green-50 p-2 rounded-lg">
-            <div className="w-7 h-7 bg-gradient-to-r from-green-600 to-green-500 rounded-full flex items-center justify-center mr-3 text-white text-sm shadow-lg">🏥</div>
-            <div>
-              <span className="font-medium text-gray-800">Hospitals</span>
-              <div className="text-green-600 font-semibold text-xs">Call 108</div>
+          
+          <div className="flex items-center justify-between">
+            <div className="flex items-center transition-all duration-200 hover:bg-green-50 p-2 rounded-lg">
+              <div className="w-7 h-7 bg-gradient-to-r from-green-600 to-green-500 rounded-full flex items-center justify-center mr-3 text-white text-sm shadow-lg">🏥</div>
+              <div>
+                <span className="font-medium text-gray-800">Hospitals</span>
+                <div className="text-green-600 font-semibold text-xs">Call 108</div>
+              </div>
             </div>
+            <Button
+              variant="outline"
+              size="sm"
+              className={`h-8 px-3 text-xs transition-all duration-200 ${
+                showHospitals 
+                  ? 'bg-green-600 text-white border-green-600 hover:bg-green-700' 
+                  : 'bg-white text-green-600 border-green-200 hover:bg-green-50'
+              }`}
+              onClick={toggleHospitals}
+            >
+              {showHospitals ? 'Hide' : 'Show'}
+            </Button>
           </div>
+          
           <div className="flex items-center transition-all duration-200 hover:bg-blue-50 p-2 rounded-lg">
             <div className="w-5 h-5 bg-gradient-to-r from-blue-600 to-blue-500 rounded-full mr-4 border-2 border-white shadow-lg animate-pulse"></div>
             <span className="font-medium text-gray-800">Your Location</span>

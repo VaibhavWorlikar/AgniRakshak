@@ -8,10 +8,11 @@ import { supabase } from '@/integrations/supabase/client';
 const Chatbot = () => {
   const [isOpen, setIsOpen] = useState(false);
   const [userLocation, setUserLocation] = useState<string>('');
+  const [locationCoords, setLocationCoords] = useState<{ lat: number; lon: number } | null>(null);
   const [messages, setMessages] = useState([
     {
       id: 1,
-      text: "🔥 Hello! I'm your AI Fire Safety Assistant powered by Google Gemini. I'm here to help with fire safety tips, emergency procedures, fire prevention, and incident response guidance. How can I assist you today?",
+      text: "🔥 Hello! I'm your AI Fire Safety Assistant. I'm here to help with fire safety tips, emergency procedures, fire prevention, and incident response guidance. How can I assist you today?",
       isBot: true,
       timestamp: new Date()
     }
@@ -33,6 +34,7 @@ const Chatbot = () => {
         async (position) => {
           const lat = position.coords.latitude;
           const lon = position.coords.longitude;
+          setLocationCoords({ lat, lon });
           
           // Reverse geocoding to get address
           try {
@@ -40,9 +42,21 @@ const Chatbot = () => {
             const data = await response.json();
             const location = `${data.address?.city || data.address?.town || data.address?.village || 'Unknown City'}, ${data.address?.state || data.address?.country || 'Unknown State'}`;
             setUserLocation(location);
+            
+            // Update welcome message with location
+            setMessages(prev => [{
+              ...prev[0],
+              text: `🔥 Hello! I'm your AI Fire Safety Assistant powered by Google Gemini. I can see you're in ${location}. I'm here to help with fire safety tips, emergency procedures, fire prevention, and location-specific guidance. How can I assist you today?`
+            }]);
           } catch (error) {
             console.error('Error getting location name:', error);
-            setUserLocation(`${lat.toFixed(4)}, ${lon.toFixed(4)}`);
+            const coordsString = `${lat.toFixed(4)}, ${lon.toFixed(4)}`;
+            setUserLocation(coordsString);
+            
+            setMessages(prev => [{
+              ...prev[0],
+              text: `🔥 Hello! I'm your AI Fire Safety Assistant powered by Google Gemini. I can see your approximate location (${coordsString}). I'm here to help with fire safety tips, emergency procedures, fire prevention, and location-specific guidance. How can I assist you today?`
+            }]);
           }
         },
         (error) => {
@@ -73,15 +87,18 @@ const Chatbot = () => {
 
     try {
       // Enhanced message with location context
-      const contextualMessage = userLocation 
-        ? `User location: ${userLocation}. User message: ${message}`
-        : message;
+      let contextualMessage = message;
+      if (userLocation && locationCoords) {
+        contextualMessage = `User location: ${userLocation} (coordinates: ${locationCoords.lat.toFixed(4)}, ${locationCoords.lon.toFixed(4)}). User message: ${message}`;
+      } else if (userLocation) {
+        contextualMessage = `User location: ${userLocation}. User message: ${message}`;
+      }
 
       // Call Gemini API through Edge Function
       const { data, error } = await supabase.functions.invoke('gemini-chat', {
         body: { 
           message: contextualMessage,
-          context: "fire safety assistant"
+          context: "fire safety assistant with location awareness"
         }
       });
 
@@ -115,11 +132,11 @@ const Chatbot = () => {
   return (
     <>
       {/* Chat Toggle Button */}
-      <div className="fixed bottom-8 right-8 z-[1002]">
+      <div className="fixed bottom-8 right-8 z-[1010]">
         {!isOpen ? (
           <Button
             onClick={() => setIsOpen(true)}
-            className="bg-gradient-to-r from-red-600 to-red-700 hover:from-red-700 hover:to-red-800 text-white rounded-full w-16 h-16 shadow-2xl transition-all duration-300 transform hover:scale-110 border-2 border-red-500/20"
+            className="bg-gradient-to-r from-red-600 to-red-700 hover:from-red-700 hover:to-red-800 text-white rounded-full w-16 h-16 shadow-2xl transition-all duration-300 transform hover:scale-110 border-2 border-red-500/20 hover:border-red-400/40"
           >
             <MessageCircle className="h-7 w-7" />
           </Button>
